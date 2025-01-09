@@ -6,7 +6,6 @@ import io.github.pedro.ifc.quarkussocial.domain.repository.PostRepository;
 import io.github.pedro.ifc.quarkussocial.domain.repository.UserRepository;
 import io.github.pedro.ifc.quarkussocial.domain.model.User;
 import io.github.pedro.ifc.quarkussocial.rest.dto.CreatePostRequest;
-import io.github.pedro.ifc.quarkussocial.rest.dto.CreateUserRequest;
 import io.github.pedro.ifc.quarkussocial.rest.dto.PostResponse;
 import io.github.pedro.ifc.quarkussocial.rest.dto.ResponseError;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
@@ -68,9 +67,14 @@ public class PostResource {
         User user = userRepository.findById(userId);
         if (user == null)
             return  Response.status(Response.Status.NOT_FOUND).build();
+
+        if(followerId==null)
+            return  Response.status(Response.Status.BAD_REQUEST)
+                    .entity("followerId is not defined in header").build();
+
         User follower = userRepository.findById(followerId);
         if (follower == null)
-            return  Response.status(Response.Status.NOT_FOUND).build();
+            return  Response.status(Response.Status.BAD_REQUEST).build();
 
         if(!this.followerRepository.follows(follower, user))
             return Response.status(Response.Status.FORBIDDEN).build();
